@@ -16,6 +16,11 @@ helpers do
     array.join
   end
   
+  def highlight_query(text, query)
+    text_array = text.split(query)
+    text_array.join("<strong>#{query}</strong>")
+  end
+  
   def each_chapter
     @contents.each_with_index do |name, index|
       number = index + 1
@@ -24,13 +29,37 @@ helpers do
     end
   end
   
+=begin
+  1. get chapter data  contents = File.read("data/chp#{number}.txt")
+  2. divide chapter into an array of paragraphs  (/\n\n/)
+  3. create a hash with key being the index in paragraph array + 1 and value being the paragraph (only with matching search)
+  4. add to results as part of 2 element subarray [{chapter results}, {paragraph results}]
+=end
+
+  def paragraphs_matching(chapter, query)
+    results = []
+    
+    paragraphs = chapter.split(/\n\n/)
+    
+    paragraphs.each_with_index do |content, index|
+      results << {number: index, content: content} if content.include?(query)
+    end
+    results
+  end
+  
   def chapters_matching(query)
     results =[]
     
     return results if !query || query.empty?
     
     each_chapter do |number, name, contents|
-      results << {number: number, name: name} if contents.include?(query)
+      if contents.include?(query)
+        chapter = {number: number, name: name}
+        paragraphs = paragraphs_matching(contents, query)
+        results << [chapter, paragraphs] 
+      else
+        next
+      end
     end
     
     results

@@ -13,7 +13,15 @@
     
     <ul>
       <% @results.each do |result| %>
-        <li><a href="/chapters/<%= result[:number] %>"><%= result[:name] %></a></li>
+        <li>
+          <a href="/chapters/<%= result[0][:number] %>"><%= result[0][:name] %></a>
+          <ul>
+            <% result[1].each do |paragraph| %>
+             <li><a href="/chapters/<%= result[0][:number]%>#p<%=paragraph[:number]%>"><%=highlight_query(paragraph[:content], params[:query])%></a></li>
+            <% end %>
+          </ul>
+        </li>
+        
       <% end %>
     </ul>
       
